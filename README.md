@@ -81,7 +81,7 @@ docker run -d --name postgres -e POSTGRES_PASSWORD=123456 -p 5432:5432 postgres:
 docker pull redis:6.2.4
 
 # 在后台启动名为redis的容器，密码为123456
-docker run -d --name redis -p 6380:6379 redis:6.2.4 --requirepass "123456"
+docker run -d --name redis -p 6379:6379 redis:6.2.4 --requirepass "123456"
 ```
 
 ### 3.4、使用Docker安装ElasticSearch & Kibana
