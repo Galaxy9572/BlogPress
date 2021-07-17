@@ -1,4 +1,4 @@
-package com.blogpress.article;
+package com.blogpress.article.controller;
 
 import com.blogpress.article.bean.converter.ArticleBeanConverter;
 import com.blogpress.article.bean.dto.ArticleDTO;
