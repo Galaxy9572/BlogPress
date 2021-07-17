@@ -155,3 +155,26 @@ comment on column "user".is_logic_deleted is '是否已经逻辑删除';
 alter table "user" owner to postgres;
 ```
 
+### 4.2、文章表
+
+```sql
+create table if not exists article
+(
+	article_id bigint not null constraint article_pk primary key,
+	user_id bigint not null,
+	title text not null,
+	content text not null,
+	create_time timestamp default CURRENT_TIMESTAMP not null,
+	update_time timestamp default CURRENT_TIMESTAMP not null,
+	is_logic_deleted boolean default false
+);
+comment on table article is '文章表';
+comment on column article.article_id is '主键';
+comment on column article.user_id is '作者ID';
+comment on column article.title is '文章标题';
+comment on column article.content is '文章内容';
+comment on column article.create_time is '文章创建时间';
+comment on column article.update_time is '文章修改时间';
+comment on column article.is_logic_deleted is '是否已经逻辑删除';
+alter table article owner to postgres;
+```

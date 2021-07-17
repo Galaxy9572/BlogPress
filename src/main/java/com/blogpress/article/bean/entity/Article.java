@@ -16,7 +16,7 @@ public class Article {
 
     /** 主键 */
     @TableId(type = IdType.ASSIGN_ID)
-    private Long id;
+    private Long articleId;
 
     /** 作者的userId */
     private Long userId;

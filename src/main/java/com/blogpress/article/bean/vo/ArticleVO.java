@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class ArticleVO {
 
     /** 主键 */
-    private Long id;
+    private Long articleId;
 
     /** 作者的userId */
     private Long userId;
