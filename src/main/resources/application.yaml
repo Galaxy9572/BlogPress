@@ -1,0 +1,47 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /blog-press
+
+application:
+  name: Blog Press
+  version: 1.0.0-SNAPSHOT
+
+spring:
+  # 数据源配置
+  datasource:
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    url: jdbc:p6spy:postgresql://192.168.50.214:5432/blogpress
+    username: postgres
+    password: 123456
+    type: com.zaxxer.hikari.HikariDataSource
+
+  # 国际化配置
+  messages:
+    basename: i18n.Messages
+  application:
+    name: Blog Press
+
+  # Redis配置
+  redis:
+    host: 192.168.50.214
+    port: 6379
+    database: 0
+    password: 123456
+
+  # Session存储方式配置
+  session:
+    store-type: redis
+
+
+# mybatis-plus配置
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: is_logic_deleted  # 全局逻辑删除的实体字段名
+      logic-delete-value: true # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: false # 逻辑未删除值(默认为 0)
+  mapper-locations: classpath*:mapper/*Mapper.xml
+  type-aliases-package: com.blogpress.**.entity
+  configuration:
+    map-underscore-to-camel-case: true
