@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 
 /**
  * 用户登录请求类
@@ -19,7 +18,7 @@ public class UserLoginRequest {
     private Long userId;
 
     @ApiModelProperty(value = "昵称", example="nick")
-    @NotEmpty(message = "{nick.cannot.empty}")
+    @NotBlank(message = "{nick.cannot.empty}")
     private String nick;
 
     @ApiModelProperty(value = "密码", example="abcd123456")

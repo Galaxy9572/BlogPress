@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.blogpress.article.dao.ArticleMapper">
+
+    <sql id="All_Columns">
+        article_id, user_id, title, content, create_time, update_time, is_logic_deleted
+    </sql>
+
+</mapper>

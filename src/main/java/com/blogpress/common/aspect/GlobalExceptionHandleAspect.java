@@ -1,7 +1,7 @@
 package com.blogpress.common.aspect;
 
 import com.blogpress.common.exception.BusinessException;
-import com.blogpress.common.rest.bean.ResponseVO;
+import com.blogpress.common.rest.ResponseVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.ObjectError;

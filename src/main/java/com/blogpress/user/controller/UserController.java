@@ -1,6 +1,6 @@
 package com.blogpress.user.controller;
 
-import com.blogpress.common.rest.bean.ResponseVO;
+import com.blogpress.common.rest.ResponseVO;
 import com.blogpress.user.bean.converter.UserBeanConverter;
 import com.blogpress.user.bean.dto.UserDTO;
 import com.blogpress.user.bean.request.UserLoginRequest;
@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
+ * 用户controller
  * @author JY
  */
 @Slf4j
@@ -40,24 +40,24 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    @ApiOperation(value = "用户注册", notes = "注册接口", httpMethod = "POST")
+    @ApiOperation(value = "用户注册", notes = "注册接口")
     @ApiResponse(code = 200, message = "OK", response = UserVO.class)
     public ResponseVO<UserVO> register(@ApiParam(name = "用户注册入参", required = true) @Valid @NotNull
-        @RequestBody UserRegisterRequest registerRequest, HttpServletRequest request) {
+        @RequestBody UserRegisterRequest registerRequest) {
 
         UserDTO userDTO = UserBeanConverter.toUserDTO(registerRequest);
-        UserVO userVO = iUserService.register(request, userDTO);
+        UserVO userVO = iUserService.register(userDTO);
         return ResponseVO.success(userVO);
     }
 
     @PostMapping("/login")
-    @ApiOperation(value = "用户登录", notes = "登录接口", httpMethod = "POST")
+    @ApiOperation(value = "用户登录", notes = "登录接口")
     @ApiResponse(code = 200, message = "OK", response = UserVO.class)
     public ResponseVO<UserVO> login(@ApiParam(name = "用户登录入参", required = true) @Valid @NotNull
-        @RequestBody UserLoginRequest loginRequest, HttpServletRequest request) {
+        @RequestBody UserLoginRequest loginRequest) {
 
         UserDTO userDTO = UserBeanConverter.toUserDTO(loginRequest);
-        UserVO userVO = iUserService.login(request, userDTO);
+        UserVO userVO = iUserService.login(userDTO);
         return ResponseVO.success(userVO);
     }
 

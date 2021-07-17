@@ -1,10 +1,11 @@
 package com.blogpress.user.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.blogpress.common.UserConstants;
 import com.blogpress.common.util.AssertUtils;
+import com.blogpress.common.util.ContextHolder;
 import com.blogpress.common.util.HashUtils;
 import com.blogpress.common.util.bean.BeanCopyUtils;
+import com.blogpress.user.bean.converter.UserBeanConverter;
 import com.blogpress.user.bean.dto.UserDTO;
 import com.blogpress.user.bean.entity.User;
 import com.blogpress.user.bean.response.UserVO;
@@ -15,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
-
 /**
  * 用户服务实现类
  *
@@ -26,12 +25,16 @@ import javax.servlet.http.HttpServletRequest;
 @Service
 public class UserServiceImpl implements IUserService {
 
+    private final UserMapper userMapper;
+
     @Autowired
-    private UserMapper userMapper;
+    public UserServiceImpl(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UserVO register(HttpServletRequest request, UserDTO userDTO) {
+    public UserVO register(UserDTO userDTO) {
         // 注册前检查昵称是否已被注册
         User existUser = userMapper.getUserByNick(userDTO.getNick());
         AssertUtils.isNull(existUser, "user.already.registered");
@@ -48,9 +51,9 @@ public class UserServiceImpl implements IUserService {
         if (count > 0) {
             Long userId = user.getUserId();
             User registeredUser = userMapper.selectById(userId);
-            UserVO vo = new UserVO();
-            BeanCopyUtils.copy(registeredUser, vo, true);
-            addUserSession(request, vo);
+            UserVO vo = UserBeanConverter.toUserVO(registeredUser);
+            UserDTO dto = UserBeanConverter.toUserDTO(registeredUser);
+            ContextHolder.addUserSession(dto);
             return vo;
         } else {
             log.error("Register Failed, Param: {}", JSON.toJSONString(userDTO));
@@ -59,10 +62,12 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public UserVO login(HttpServletRequest request, UserDTO user) {
-        UserVO userVO = getUserSession(request, user.getUserId());
-        if (userVO != null) {
-            return userVO;
+    public UserVO login(UserDTO user) {
+        UserDTO dto = ContextHolder.currentLoginUser();
+        if (dto != null) {
+            UserVO vo = new UserVO();
+            BeanCopyUtils.copy(dto, vo, true);
+            return vo;
         }
         // 检查用户是否存在
         User existUser = userMapper.getUserByNick(user.getNick());
@@ -75,39 +80,10 @@ public class UserServiceImpl implements IUserService {
         String loginPasswordHash = HashUtils.sha256(password + salt);
         AssertUtils.equal(loginPasswordHash, passwordHash, "nick.or.password.wrong");
 
-        UserVO vo = new UserVO();
-        BeanCopyUtils.copy(existUser, vo, true);
-        addUserSession(request, vo);
+        UserVO vo = UserBeanConverter.toUserVO(existUser);
+        dto = UserBeanConverter.toUserDTO(existUser);
+        ContextHolder.addUserSession(dto);
         return vo;
-    }
-
-    /**
-     * 获取用户session
-     * @param request HttpServletRequest
-     * @param userId  用户ID
-     * @return UserVO
-     */
-    private static UserVO getUserSession(HttpServletRequest request, Long userId) {
-        if (request == null || userId == null) {
-            log.warn("Cannot get user session, request or userId is null");
-            return null;
-        }
-        String userSessionKey = UserConstants.getUserSessionKey(userId);
-        return (UserVO) request.getSession().getAttribute(userSessionKey);
-    }
-
-    /**
-     * 添加用户session
-     * @param request HttpServletRequest
-     * @param userVO  UserVO
-     */
-    private static void addUserSession(HttpServletRequest request, UserVO userVO) {
-        if (request == null || userVO == null) {
-            log.warn("Cannot add user session, request or userVO is null");
-            return;
-        }
-        String userSessionKey = UserConstants.getUserSessionKey(userVO.getUserId());
-        request.getSession().setAttribute(userSessionKey, userVO);
     }
 
 }

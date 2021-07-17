@@ -2,6 +2,7 @@ package com.blogpress.user.bean.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -10,7 +11,9 @@ import java.time.LocalDateTime;
  * @author JY
  */
 @Data
-public class UserDTO {
+public class UserDTO implements Serializable {
+
+    private static final Long serialVersionUID = 1L;
 
     /** 主键 */
     private Long userId;

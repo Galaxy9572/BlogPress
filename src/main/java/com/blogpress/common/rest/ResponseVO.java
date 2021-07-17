@@ -1,8 +1,11 @@
-package com.blogpress.common.rest.bean;
+package com.blogpress.common.rest;
 
+import com.blogpress.common.util.SpringBeanUtil;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 
 /**
@@ -25,6 +28,12 @@ public class ResponseVO<T> {
     @ApiModelProperty("返回数据")
     private T data;
 
+    public static <T> ResponseVO<T> success(String i18nCode){
+        MessageSource messageSource = SpringBeanUtil.getBean(MessageSource.class);
+        String i18nMessage = messageSource.getMessage(i18nCode, null, LocaleContextHolder.getLocale());
+        return ResponseVO.build(HttpStatus.OK.value(), i18nMessage, null);
+    }
+
     public static <T> ResponseVO<T> success(T data){
         return ResponseVO.build(HttpStatus.OK.value(), HttpStatus.OK.getReasonPhrase(), data);
     }
@@ -41,8 +50,10 @@ public class ResponseVO<T> {
         return ResponseVO.build(status.value(), message, null);
     }
 
-    public static <T> ResponseVO<T> failed(String message){
-        return ResponseVO.build(HttpStatus.EXPECTATION_FAILED.value(), message, null);
+    public static <T> ResponseVO<T> failed(String i18nCode){
+        MessageSource messageSource = SpringBeanUtil.getBean(MessageSource.class);
+        String i18nMessage = messageSource.getMessage(i18nCode, null, LocaleContextHolder.getLocale());
+        return ResponseVO.build(HttpStatus.EXPECTATION_FAILED.value(), i18nMessage, null);
     }
 
     public static <T> ResponseVO<T> failed(HttpStatus status){
