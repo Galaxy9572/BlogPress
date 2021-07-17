@@ -111,3 +111,47 @@ docker pull rabbitmq:management
 # 在后台启动容器，默认用户和密码均为admin
 docker run -dit --name rabbitmq -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin -p 15672:15672 -p 5672:5672 rabbitmq:management
 ```
+
+## 4、建表语句
+
+### 4.1、User表
+
+```sql
+create table if not exists "user"
+(
+	user_id bigint not null constraint user_pk primary key,
+	nick varchar(20) not null,
+	password_hash varchar(128) not null,
+	salt varchar(64) not null,
+	gender varchar(1) not null,
+	birthday date not null,
+	phone varchar(20),
+	email varchar(100),
+	country varchar(100),
+	province varchar(100),
+	city varchar(100),
+	street varchar(100),
+	create_time timestamp default CURRENT_TIMESTAMP,
+	update_time timestamp default CURRENT_TIMESTAMP,
+	user_status varchar(20) default 'NORMAL'::character varying,
+	is_logic_deleted boolean default false
+);
+comment on column "user".user_id is '主键';
+comment on column "user".nick is '昵称';
+comment on column "user".password_hash is '密码哈希';
+comment on column "user".salt is '密码盐值';
+comment on column "user".gender is '性别';
+comment on column "user".birthday is '生日';
+comment on column "user".phone is '手机号';
+comment on column "user".email is '邮箱';
+comment on column "user".country is '国家';
+comment on column "user".province is '省份';
+comment on column "user".city is '城市';
+comment on column "user".street is '街道';
+comment on column "user".create_time is '注册时间';
+comment on column "user".update_time is '信息更新时间';
+comment on column "user".user_status is '用户状态';
+comment on column "user".is_logic_deleted is '是否已经逻辑删除';
+alter table "user" owner to postgres;
+```
+
