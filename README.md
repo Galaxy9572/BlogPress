@@ -45,5 +45,69 @@
 
 - PostgreSQL 12.1
 - Redis 6.2.4
-- ElasticSearch
-- RabbitMQ
+- ElasticSearch 7.13.3
+- Elastic Kibana 7.13.3
+- RabbitMQ 3.8.19
+
+## 3、环境搭建(基于CentOS 7)
+
+### 3.1、Docker安装
+
+```
+# 安装yum-utils
+sudo yum install -y yum-utils
+
+# 添加docker安装仓库
+sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+# 安装最新版docker
+sudo yum install docker-ce docker-ce-cli containerd.io
+```
+
+### 3.2、使用Docker安装PostgreSQL
+
+```
+# 拉取镜像
+docker pull postgres:12.1
+
+# 在后台启动名为postgres的容器，密码为123456，将本机/data/pgdata映射到容器内的/var/lib/postgresql/data
+docker run -d --name postgres -e POSTGRES_PASSWORD=123456 -p 5432:5432 postgres:12.1 -v /data/pgdata:/var/lib/postgresql/data
+```
+
+### 3.3、使用Docker安装Redis
+
+```
+# 拉取镜像
+docker pull redis:6.2.4
+
+# 在后台启动名为redis的容器，密码为123456
+docker run -d --name redis -p 6380:6379 redis:6.2.4 --requirepass "123456"
+```
+
+### 3.4、使用Docker安装ElasticSearch & Kibana
+
+```
+# 拉取镜像
+docker pull docker.elastic.co/elasticsearch/elasticsearch:7.13.3
+docker pull docker.elastic.co/kibana/kibana:7.13.3
+
+# 启动容器(单节点)
+# 创建名为elastic的网络
+docker network create elastic
+
+# 在后台启动名字为elasticsearch的容器
+docker run -d --name elasticsearch --net elastic -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.13.3
+
+# 在后台启动名字为kibana的容器
+docker run -d --name kibana --net elastic -p 5601:5601 -e "ELASTICSEARCH_HOSTS=http://elasticsearch:9200" docker.elastic.co/kibana/kibana:7.13.3
+```
+
+### 3.5、使用Docker安装RabbitMQ
+
+```
+# 拉取镜像
+docker pull rabbitmq:management
+
+# 在后台启动容器，默认用户和密码均为admin
+docker run -dit --name rabbitmq -e RABBITMQ_DEFAULT_USER=admin -e RABBITMQ_DEFAULT_PASS=admin -p 15672:15672 -p 5672:5672 rabbitmq:management
+```
