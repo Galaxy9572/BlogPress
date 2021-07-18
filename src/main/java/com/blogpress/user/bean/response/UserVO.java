@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 用户前端视图类
@@ -61,5 +62,9 @@ public class UserVO implements Serializable {
     /** 更新时间 */
     @ApiModelProperty(value = "用户信息更新时间", example = "2021-07-01 12:00:00")
     private String updateTime;
+
+    /** 用户角色列表 */
+    @ApiModelProperty(value = "用户角色列表", example = "[{'userId':'1234', 'code':'user'}]")
+    private List<UserRoleVO> roles;
 
 }

@@ -5,6 +5,9 @@ import com.blogpress.article.bean.entity.Article;
 import com.blogpress.article.bean.response.ArticleVO;
 import com.blogpress.article.request.CreateArticleRequest;
 import com.blogpress.common.util.bean.BeanCopyUtils;
+import com.blogpress.count.bean.converter.CountBeanConverter;
+import com.blogpress.count.bean.entity.Count;
+import com.blogpress.count.bean.response.CountVO;
 
 /**
  * 文章Bean转换器
@@ -30,12 +33,14 @@ public class ArticleBeanConverter {
         return dto;
     }
 
-    public static ArticleVO toArticleVO(Article article) {
+    public static ArticleVO toArticleVO(Article article, Count count) {
         if(article == null){
             return null;
         }
         ArticleVO vo = new ArticleVO();
         BeanCopyUtils.copy(article, vo, true);
+        CountVO countVO = CountBeanConverter.toCountVO(count);
+        vo.setCount(countVO);
         return vo;
     }
 

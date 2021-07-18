@@ -1,6 +1,8 @@
 package com.blogpress.user.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.blogpress.common.enums.role.RoleEnum;
+import com.blogpress.common.exception.BusinessException;
 import com.blogpress.common.util.AssertUtils;
 import com.blogpress.common.util.ContextHolder;
 import com.blogpress.common.util.HashUtils;
@@ -8,13 +10,17 @@ import com.blogpress.common.util.bean.BeanCopyUtils;
 import com.blogpress.user.bean.converter.UserBeanConverter;
 import com.blogpress.user.bean.dto.UserDTO;
 import com.blogpress.user.bean.entity.User;
+import com.blogpress.user.bean.entity.UserRole;
 import com.blogpress.user.bean.response.UserVO;
 import com.blogpress.user.dao.UserMapper;
+import com.blogpress.user.dao.UserRoleMapper;
 import com.blogpress.user.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 用户服务实现类
@@ -27,9 +33,12 @@ public class UserServiceImpl implements IUserService {
 
     private final UserMapper userMapper;
 
+    private final UserRoleMapper userRoleMapper;
+
     @Autowired
-    public UserServiceImpl(UserMapper userMapper) {
+    public UserServiceImpl(UserMapper userMapper, UserRoleMapper userRoleMapper) {
         this.userMapper = userMapper;
+        this.userRoleMapper = userRoleMapper;
     }
 
     @Override
@@ -39,25 +48,32 @@ public class UserServiceImpl implements IUserService {
         User existUser = userMapper.getUserByNick(userDTO.getNick());
         AssertUtils.isNull(existUser, "user.already.registered");
 
+        // 用户表插入数据
         User user = new User();
         BeanCopyUtils.copy(userDTO, user);
         String salt = HashUtils.randomUuid();
         String passwordHash = HashUtils.sha256(userDTO.getPassword() + salt);
         user.setPasswordHash(passwordHash);
         user.setSalt(salt);
+        int userCount = userMapper.insert(user);
 
-        int count = userMapper.insert(user);
+        // 角色表插入数据
+        UserRole userRole = new UserRole();
+        userRole.setUserId(user.getUserId());
+        userRole.setCode(RoleEnum.USER.getCode());
+        int roleCount = userRoleMapper.insert(userRole);
 
-        if (count > 0) {
+        if (userCount > 0 && roleCount > 0) {
             Long userId = user.getUserId();
             User registeredUser = userMapper.selectById(userId);
-            UserVO vo = UserBeanConverter.toUserVO(registeredUser);
-            UserDTO dto = UserBeanConverter.toUserDTO(registeredUser);
+            List<UserRole> roles = userRoleMapper.selectByUserId(userId);
+            UserVO vo = UserBeanConverter.toUserVO(registeredUser, roles);
+            UserDTO dto = UserBeanConverter.toUserDTO(registeredUser, roles);
             ContextHolder.addUserSession(dto);
             return vo;
         } else {
             log.error("Register Failed, Param: {}", JSON.toJSONString(userDTO));
-            return null;
+            throw BusinessException.of("user.register.failed");
         }
     }
 
@@ -65,9 +81,7 @@ public class UserServiceImpl implements IUserService {
     public UserVO login(UserDTO user) {
         UserDTO dto = ContextHolder.currentLoginUser();
         if (dto != null) {
-            UserVO vo = new UserVO();
-            BeanCopyUtils.copy(dto, vo, true);
-            return vo;
+            return UserBeanConverter.toUserVO(dto);
         }
         // 检查用户是否存在
         User existUser = userMapper.getUserByNick(user.getNick());
@@ -80,8 +94,9 @@ public class UserServiceImpl implements IUserService {
         String loginPasswordHash = HashUtils.sha256(password + salt);
         AssertUtils.equal(loginPasswordHash, passwordHash, "nick.or.password.wrong");
 
-        UserVO vo = UserBeanConverter.toUserVO(existUser);
-        dto = UserBeanConverter.toUserDTO(existUser);
+        List<UserRole> roles = userRoleMapper.selectByUserId(existUser.getUserId());
+        UserVO vo = UserBeanConverter.toUserVO(existUser, roles);
+        dto = UserBeanConverter.toUserDTO(existUser, roles);
         ContextHolder.addUserSession(dto);
         return vo;
     }

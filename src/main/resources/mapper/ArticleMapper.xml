@@ -5,7 +5,18 @@
 <mapper namespace="com.blogpress.article.dao.ArticleMapper">
 
     <sql id="All_Columns">
-        article_id, user_id, title, content, create_time, update_time, is_logic_deleted
+        article_id, user_id, title, content, create_time, update_time, is_logic_deleted, version
     </sql>
 
+    <select id="selectUserArticlesByPage" resultType="com.blogpress.article.bean.entity.Article">
+        select <include refid="All_Columns"/>
+        from article
+        <where>
+            user_id = #{userId}
+            and is_logic_deleted = false
+        </where>
+        order by
+        create_time desc
+    </select>
+    
 </mapper>

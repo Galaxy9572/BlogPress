@@ -1,9 +1,6 @@
 package com.blogpress.user.bean.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -66,5 +63,9 @@ public class User {
     /** 逻辑删除状态 */
     @TableLogic
     private Boolean isLogicDeleted;
+
+    /** 版本号 */
+    @Version
+    private Long version;
 
 }

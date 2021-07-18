@@ -2,6 +2,7 @@ package com.blogpress.common.util;
 
 import com.blogpress.common.exception.BusinessException;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 
 import java.util.Objects;
 
@@ -58,6 +59,40 @@ public class AssertUtils {
      */
     public static void equal(Object o1, Object o2, String i18nCode) {
         if (!Objects.equals(o1, o2)) {
+            throw BusinessException.of(i18nCode);
+        }
+    }
+
+    /**
+     * 断言为true，否则抛出业务异常
+     * @param bool 布尔值
+     * @param i18nCode 错误信息编码
+     */
+    public static void isTrue(boolean bool, String i18nCode){
+        if (!bool) {
+            throw BusinessException.of(i18nCode);
+        }
+    }
+
+    /**
+     * 断言为true，否则抛出业务异常
+     * @param bool 布尔值
+     * @param httpStatus HttpStatus
+     * @param i18nCode 错误信息编码
+     */
+    public static void isTrue(boolean bool, HttpStatus httpStatus, String i18nCode){
+        if (!bool) {
+            throw BusinessException.of(httpStatus, i18nCode);
+        }
+    }
+
+    /**
+     * 断言为true，否则抛出业务异常
+     * @param bool 布尔值
+     * @param i18nCode 错误信息编码
+     */
+    public static void isFalse(boolean bool, String i18nCode){
+        if (bool) {
             throw BusinessException.of(i18nCode);
         }
     }

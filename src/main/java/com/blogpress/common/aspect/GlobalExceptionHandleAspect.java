@@ -39,7 +39,7 @@ public class GlobalExceptionHandleAspect {
      */
     @ExceptionHandler(BusinessException.class)
     public ResponseVO<String> handleBusinessException(BusinessException e){
-        return ResponseVO.failed(HttpStatus.EXPECTATION_FAILED, e.getMessage());
+        return ResponseVO.failed(e.getHttpStatus(), e.getMessage());
     }
 
     /**

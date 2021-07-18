@@ -1,10 +1,12 @@
 package com.blogpress.user.bean.dto;
 
+import com.baomidou.mybatisplus.annotation.Version;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 用户实体DTO类
@@ -62,5 +64,12 @@ public class UserDTO implements Serializable {
 
     /** 逻辑删除状态 */
     private Boolean isLogicDeleted;
+
+    /** 用户角色列表 */
+    private List<UserRoleDTO> roles;
+
+    /** 版本号 */
+    @Version
+    private Long version;
 
 }

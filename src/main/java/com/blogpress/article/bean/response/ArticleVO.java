@@ -1,5 +1,6 @@
 package com.blogpress.article.bean.response;
 
+import com.blogpress.count.bean.response.CountVO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -33,5 +34,8 @@ public class ArticleVO {
     /** 更新时间 */
     @ApiModelProperty(value = "文章修改时间", example = "2021-01-01")
     private String updateTime;
+
+    /** 统计对象 */
+    private CountVO count;
 
 }

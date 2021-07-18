@@ -32,4 +32,7 @@ public class ArticleDTO {
     /** 逻辑删除状态 */
     private Boolean isLogicDeleted;
 
+    /** 版本号 */
+    private Long version;
+
 }

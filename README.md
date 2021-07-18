@@ -134,7 +134,8 @@ create table if not exists "user"
 	create_time timestamp default CURRENT_TIMESTAMP,
 	update_time timestamp default CURRENT_TIMESTAMP,
 	user_status varchar(20) default 'NORMAL'::character varying,
-	is_logic_deleted boolean default false
+	is_logic_deleted boolean default false,
+    version bigint default 0
 );
 comment on column "user".user_id is '主键';
 comment on column "user".nick is '昵称';
@@ -152,10 +153,34 @@ comment on column "user".create_time is '注册时间';
 comment on column "user".update_time is '信息更新时间';
 comment on column "user".user_status is '用户状态';
 comment on column "user".is_logic_deleted is '是否已经逻辑删除';
+comment on column "user".version is '版本号';
 alter table "user" owner to postgres;
 ```
 
-### 4.2、文章表
+### 4.2、用户角色表
+
+```sql
+create table user_role
+(
+    role_id bigint not null constraint user_role_pk primary key,
+	user_id bigint not null,
+	code varchar(20) not null,
+	create_time timestamp default CURRENT_TIMESTAMP,
+	update_time timestamp default CURRENT_TIMESTAMP,
+	is_logic_deleted boolean default false,
+    version bigint default 0
+);
+comment on column user_role.role_id is '主键';
+comment on column user_role.user_id is '用户ID';
+comment on column user_role.code is '角色编码';
+comment on column user_role.create_time is '注册时间';
+comment on column user_role.update_time is '信息更新时间';
+comment on column user_role.is_logic_deleted is '是否已经逻辑删除';
+comment on column user_role.version is '版本号';
+alter table user_role owner to postgres;
+```
+
+### 4.3、文章表
 
 ```sql
 create table if not exists article
@@ -166,7 +191,8 @@ create table if not exists article
 	content text not null,
 	create_time timestamp default CURRENT_TIMESTAMP not null,
 	update_time timestamp default CURRENT_TIMESTAMP not null,
-	is_logic_deleted boolean default false
+	is_logic_deleted boolean default false,
+    version bigint default 0
 );
 comment on table article is '文章表';
 comment on column article.article_id is '主键';
@@ -176,5 +202,75 @@ comment on column article.content is '文章内容';
 comment on column article.create_time is '文章创建时间';
 comment on column article.update_time is '文章修改时间';
 comment on column article.is_logic_deleted is '是否已经逻辑删除';
+comment on column article.version is '版本号';
 alter table article owner to postgres;
+```
+
+### 4.4、统计表
+
+```sql
+create table count
+(
+	count_id bigint not null constraint count_pk primary key,
+	content_type varchar(20) not null,
+    content_id bigint not null,
+	like_count int default 0 not null,
+	collect_count int default 0 not null,
+	comment_count int default 0 not null,
+	is_logic_deleted bool default false not null,
+	version bigint default 0
+);
+comment on table count is '统计表';
+comment on column count.count_id is '主键';
+comment on column count.content_type is '内容分类';
+comment on column count.content_id is '内容主键';
+comment on column count.like_count is '点赞数';
+comment on column count.collect_count is '收藏数';
+comment on column count.comment_count is '评论数';
+comment on column count.is_logic_deleted is '是否已经逻辑删除';
+comment on column count.version is '版本号';
+```
+
+## 5、Elastic Search建索引
+
+```
+PUT {{host}}:9200/index_user?pretty
+
+{
+    "settings": {
+        "number_of_shards": 3,
+        "number_of_replicas": 2
+    },
+    "mappings": {
+        "properties": {
+            "user_id": {
+                "type": "long"
+            },
+            "nick": {
+                "type": "keyword"
+            },
+            "gender": {
+                "type": "keyword"
+            },
+            "birthday": {
+                "type": "keyword"
+            },
+            "country": {
+                "type": "keyword"
+            },
+            "province": {
+                "type": "keyword"
+            },
+            "city": {
+                "type": "keyword"
+            },
+            "user_status": {
+                "type": "keyword"
+            },
+            "is_logic_deleted": {
+                "type": "keyword"
+            }
+        }
+    }
+}
 ```

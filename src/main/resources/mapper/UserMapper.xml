@@ -5,7 +5,8 @@
 <mapper namespace="com.blogpress.user.dao.UserMapper">
 
     <sql id="All_Columns">
-        user_id, nick, password_hash, salt, gender, birthday, phone, email, country, province, city, street, create_time, update_time, user_status, is_logic_deleted
+        user_id, nick, password_hash, salt, gender, birthday, phone, email, country, province, city,
+        street, create_time, update_time, user_status, is_logic_deleted, version
     </sql>
 
     <select id="getUserByNick" resultType="com.blogpress.user.bean.entity.User">

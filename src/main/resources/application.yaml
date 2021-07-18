@@ -10,11 +10,42 @@ application:
 spring:
   # 数据源配置
   datasource:
-    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
-    url: jdbc:p6spy:postgresql://192.168.50.214:5432/blogpress
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://192.168.50.214:5432/blogpress
     username: postgres
     password: 123456
-    type: com.zaxxer.hikari.HikariDataSource
+    type: com.alibaba.druid.pool.DruidDataSource
+
+    druid:
+      #初始化时建立物理连接的个数
+      initial-size: 3
+      #最小连接池数量
+      min-idle: 3
+      #最大连接池数量
+      max-active: 10
+      #获取连接时最大等待时间
+      max-wait: 60000
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: /druid/*,*.js,*.gif,*.jpg,*.bmp,*.png,*.css,*.ico
+        session-stat-enable: true
+
+      stat-view-servlet:
+        #配置监控页面访问登录名称
+        login-username: admin
+        #配置监控页面访问密码
+        login-password: admin
+        enabled: true
+        url-pattern: /druid/*
+      filter:
+        stat:
+          # 打开记录慢SQL功能
+          log-slow-sql: true
+          # 慢SQL阈值
+          slow-sql-millis: 1000
+      filters: stat,wall
+      aop-patterns: com.blogpress
 
   # 国际化配置
   messages:
@@ -33,6 +64,9 @@ spring:
   session:
     store-type: redis
 
+  elasticsearch:
+    rest:
+      uris: 192.168.50.214:9200
 
 # mybatis-plus配置
 mybatis-plus:
@@ -45,3 +79,7 @@ mybatis-plus:
   type-aliases-package: com.blogpress.**.entity
   configuration:
     map-underscore-to-camel-case: true
+
+# PageHelper配置
+pagehelper:
+  auto-dialect: true

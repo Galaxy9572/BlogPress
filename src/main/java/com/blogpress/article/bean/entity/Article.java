@@ -3,6 +3,7 @@ package com.blogpress.article.bean.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.Version;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -36,5 +37,9 @@ public class Article {
     /** 逻辑删除状态 */
     @TableLogic
     private Boolean isLogicDeleted;
+
+    /** 版本号 */
+    @Version
+    private Long version;
 
 }

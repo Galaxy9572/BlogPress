@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
@@ -79,6 +80,18 @@ public class TimeUtils {
      */
     public static String toDateTimeString(LocalDateTime dateTime) {
         return dateTime.format(DATE_TIME_FORMATTER);
+    }
+
+    /**
+     * 时间戳转为LocalDateTime
+     * @param timestamp 时间戳
+     * @return LocalDateTime
+     */
+    public static LocalDateTime fromTimestamp(Long timestamp){
+        if(timestamp == null) {
+            throw new IllegalArgumentException("timestamp cannot null");
+        }
+        return LocalDateTime.ofEpochSecond(timestamp, 0, OffsetDateTime.now().getOffset());
     }
 
 }
