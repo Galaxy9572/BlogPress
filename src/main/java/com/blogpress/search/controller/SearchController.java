@@ -43,7 +43,7 @@ public class SearchController {
     }
 
     @GetMapping("/article")
-    @ApiOperation(value = "分页搜索用户列表", notes = "分页搜索用户列表接口")
+    @ApiOperation(value = "分页搜索文章列表", notes = "分页搜索文章列表接口")
     @ApiResponse(code = 200, message = "OK", response = SearchUser.class)
     public ResponseVO<PageVO<SearchArticle>> searchArticle(@Valid @Min(value = 1, message = "page.param.invalid")
         @RequestParam @DefaultValue("1") Integer pageNo, @Valid @Min(value = 1, message = "page.param.invalid")
