@@ -20,6 +20,7 @@ import com.blogpress.count.bean.dto.CountDTO;
 import com.blogpress.count.bean.response.CountVO;
 import com.blogpress.count.enums.ContentTypeEnum;
 import com.blogpress.count.service.ICountService;
+import com.blogpress.search.service.ISearchService;
 import com.blogpress.user.bean.dto.UserDTO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -51,6 +52,9 @@ public class ArticleServiceImpl implements IArticleService {
     private ArticleMapper articleMapper;
 
     @Autowired
+    private ISearchService iSearchService;
+
+    @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
 
     @Override
@@ -75,6 +79,7 @@ public class ArticleServiceImpl implements IArticleService {
             String articleKey = RedisKeyConstants.articleKey(article.getArticleId());
 
             redisTemplate.opsForValue().set(articleKey, articleDTO);
+            iSearchService.saveArticle(createdArticle);
             articleVO.setCount(countVO);
             return articleVO;
         } else {

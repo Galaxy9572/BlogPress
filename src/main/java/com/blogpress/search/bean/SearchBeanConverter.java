@@ -1,6 +1,8 @@
 package com.blogpress.search.bean;
 
+import com.blogpress.article.bean.entity.Article;
 import com.blogpress.common.util.bean.BeanCopyUtils;
+import com.blogpress.search.bean.entity.SearchArticle;
 import com.blogpress.search.bean.entity.SearchUser;
 import com.blogpress.user.bean.entity.User;
 
@@ -16,6 +18,15 @@ public class SearchBeanConverter {
         SearchUser searchUser = new SearchUser();
         BeanCopyUtils.copy(user, searchUser);
         return searchUser;
+    }
+
+    public static SearchArticle toSearchArticle(Article article){
+        if(article == null){
+            return null;
+        }
+        SearchArticle searchArticle = new SearchArticle();
+        BeanCopyUtils.copy(article, searchArticle, true);
+        return searchArticle;
     }
 
 }

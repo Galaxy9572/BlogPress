@@ -2,9 +2,12 @@ package com.blogpress.search.controller;
 
 import com.blogpress.common.bean.response.PageVO;
 import com.blogpress.common.bean.response.ResponseVO;
+import com.blogpress.search.bean.entity.SearchArticle;
 import com.blogpress.search.bean.entity.SearchUser;
 import com.blogpress.search.service.ISearchService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.http.MediaType;
@@ -30,10 +33,22 @@ public class SearchController {
     private ISearchService iSearchService;
 
     @GetMapping("/user")
+    @ApiOperation(value = "分页搜索用户列表", notes = "分页搜索用户列表接口")
+    @ApiResponse(code = 200, message = "OK", response = SearchUser.class)
     public ResponseVO<PageVO<SearchUser>> searchUser(@Valid @Min(value = 1, message = "page.param.invalid")
         @RequestParam @DefaultValue("1") Integer pageNo, @Valid @Min(value = 1, message = "page.param.invalid")
         @RequestParam @DefaultValue("10")Integer pageSize, @RequestParam @Valid @NotBlank(message = "search.key.cannot.empty") String nick) {
         PageVO<SearchUser> pageVO = iSearchService.searchUserByNick(pageNo, pageSize, nick);
+        return ResponseVO.success(pageVO);
+    }
+
+    @GetMapping("/article")
+    @ApiOperation(value = "分页搜索用户列表", notes = "分页搜索用户列表接口")
+    @ApiResponse(code = 200, message = "OK", response = SearchUser.class)
+    public ResponseVO<PageVO<SearchArticle>> searchArticle(@Valid @Min(value = 1, message = "page.param.invalid")
+        @RequestParam @DefaultValue("1") Integer pageNo, @Valid @Min(value = 1, message = "page.param.invalid")
+        @RequestParam @DefaultValue("10") Integer pageSize, @RequestParam @Valid @NotBlank(message = "search.key.cannot.empty") String keyword) {
+        PageVO<SearchArticle> pageVO = iSearchService.searchArticle(pageNo, pageSize, keyword);
         return ResponseVO.success(pageVO);
     }
 
