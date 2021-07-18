@@ -2,7 +2,7 @@ package com.blogpress.article.service;
 
 import com.blogpress.article.bean.response.ArticleVO;
 import com.blogpress.article.request.CreateArticleRequest;
-import com.github.pagehelper.PageInfo;
+import com.blogpress.common.bean.response.PageVO;
 
 /**
  * 文章服务
@@ -38,5 +38,5 @@ public interface IArticleService {
      * @param pageSize 页大小
      * @return PageInfo
      */
-    PageInfo<ArticleVO> listUserArticles(Long userId, Integer pageNo, Integer pageSize);
+    PageVO<ArticleVO> listUserArticles(Long userId, Integer pageNo, Integer pageSize);
 }

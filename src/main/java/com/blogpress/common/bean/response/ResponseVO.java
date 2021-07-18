@@ -1,4 +1,4 @@
-package com.blogpress.common.rest;
+package com.blogpress.common.bean.response;
 
 import com.blogpress.common.util.SpringBeanUtil;
 import io.swagger.annotations.ApiModel;
@@ -7,6 +7,8 @@ import lombok.Data;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
+
+import java.text.MessageFormat;
 
 /**
  * 返回结果类
@@ -54,6 +56,13 @@ public class ResponseVO<T> {
         MessageSource messageSource = SpringBeanUtil.getBean(MessageSource.class);
         String i18nMessage = messageSource.getMessage(i18nCode, null, LocaleContextHolder.getLocale());
         return ResponseVO.build(HttpStatus.EXPECTATION_FAILED.value(), i18nMessage, null);
+    }
+
+    public static <T> ResponseVO<T> failed(HttpStatus status, String i18nCode, Object... params){
+        MessageSource messageSource = SpringBeanUtil.getBean(MessageSource.class);
+        String i18nMessage = messageSource.getMessage(i18nCode, null, LocaleContextHolder.getLocale());
+        String message = MessageFormat.format(i18nMessage, params);
+        return ResponseVO.build(status.value(), message, null);
     }
 
     public static <T> ResponseVO<T> failed(HttpStatus status){

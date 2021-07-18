@@ -1,11 +1,12 @@
 package com.blogpress.common.aspect;
 
+import com.blogpress.common.bean.response.ResponseVO;
 import com.blogpress.common.exception.BusinessException;
-import com.blogpress.common.rest.ResponseVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -30,6 +31,17 @@ public class GlobalExceptionHandleAspect {
         List<ObjectError> allErrors = e.getBindingResult().getAllErrors();
         allErrors.forEach(error -> builder.append(error.getDefaultMessage()));
         return ResponseVO.failed(builder.toString());
+    }
+
+    /**
+     * 处理参数缺失异常
+     * @param e MethodArgumentNotValidException
+     * @return ResponseVO
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseVO<String> handleMissingServletRequestParameterException(MissingServletRequestParameterException e){
+        String parameterName = e.getParameterName();
+        return ResponseVO.failed(HttpStatus.BAD_REQUEST, "missing.parameter", parameterName);
     }
 
     /**

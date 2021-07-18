@@ -8,6 +8,7 @@ import com.blogpress.article.bean.response.ArticleVO;
 import com.blogpress.article.dao.ArticleMapper;
 import com.blogpress.article.request.CreateArticleRequest;
 import com.blogpress.article.service.IArticleService;
+import com.blogpress.common.bean.response.PageVO;
 import com.blogpress.common.constants.RedisKeyConstants;
 import com.blogpress.common.exception.BusinessException;
 import com.blogpress.common.util.AssertUtils;
@@ -22,7 +23,6 @@ import com.blogpress.count.service.ICountService;
 import com.blogpress.user.bean.dto.UserDTO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -131,10 +131,10 @@ public class ArticleServiceImpl implements IArticleService {
     }
 
     @Override
-    public PageInfo<ArticleVO> listUserArticles(Long userId, Integer pageNo, Integer pageSize) {
+    public PageVO<ArticleVO> listUserArticles(Long userId, Integer pageNo, Integer pageSize) {
         PageHelper.startPage(pageNo, pageSize);
         Page<Article> articleList = articleMapper.selectUserArticlesByPage(userId);
-        PageInfo<ArticleVO> pageInfo = PageUtils.of(articleList, ArticleVO.class);
+        PageVO<ArticleVO> pageInfo = PageUtils.of(articleList, ArticleVO.class);
         if(!CollectionUtils.isEmpty(articleList)){
             List<Long> articleIds = articleList.stream().map(Article::getArticleId).collect(Collectors.toList());
             Map<Long, CountDTO> countMap = new HashMap<>();

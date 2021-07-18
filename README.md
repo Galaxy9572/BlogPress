@@ -124,7 +124,7 @@ create table if not exists "user"
 	password_hash varchar(128) not null,
 	salt varchar(64) not null,
 	gender varchar(1) not null,
-	birthday date not null,
+	birthday date,
 	phone varchar(20),
 	email varchar(100),
 	country varchar(100),

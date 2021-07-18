@@ -7,6 +7,7 @@ import com.blogpress.common.util.AssertUtils;
 import com.blogpress.common.util.ContextHolder;
 import com.blogpress.common.util.HashUtils;
 import com.blogpress.common.util.bean.BeanCopyUtils;
+import com.blogpress.search.service.ISearchService;
 import com.blogpress.user.bean.converter.UserBeanConverter;
 import com.blogpress.user.bean.dto.UserDTO;
 import com.blogpress.user.bean.entity.User;
@@ -33,15 +34,15 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements IUserService {
 
-    private final UserMapper userMapper;
-
-    private final UserRoleMapper userRoleMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
-    public UserServiceImpl(UserMapper userMapper, UserRoleMapper userRoleMapper) {
-        this.userMapper = userMapper;
-        this.userRoleMapper = userRoleMapper;
-    }
+    private UserRoleMapper userRoleMapper;
+
+    @Autowired
+    private ISearchService iSearchService;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -72,6 +73,7 @@ public class UserServiceImpl implements IUserService {
             UserVO vo = UserBeanConverter.toUserVO(registeredUser, roles);
             UserDTO dto = UserBeanConverter.toUserDTO(registeredUser, roles);
             ContextHolder.addUserSession(dto);
+            iSearchService.saveUser(registeredUser);
             return vo;
         } else {
             log.error("Register Failed, Param: {}", JSON.toJSONString(request));

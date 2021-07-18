@@ -1,6 +1,6 @@
 package com.blogpress.user.controller;
 
-import com.blogpress.common.rest.ResponseVO;
+import com.blogpress.common.bean.response.ResponseVO;
 import com.blogpress.user.bean.request.UserLoginRequest;
 import com.blogpress.user.bean.request.UserRegisterRequest;
 import com.blogpress.user.bean.response.UserVO;

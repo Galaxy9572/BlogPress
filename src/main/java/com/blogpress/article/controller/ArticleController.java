@@ -4,8 +4,8 @@ import com.blogpress.article.bean.response.ArticleVO;
 import com.blogpress.article.request.CreateArticleRequest;
 import com.blogpress.article.service.IArticleService;
 import com.blogpress.common.annotation.Permission;
-import com.blogpress.common.rest.ResponseVO;
-import com.github.pagehelper.PageInfo;
+import com.blogpress.common.bean.response.PageVO;
+import com.blogpress.common.bean.response.ResponseVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 
 /**
  * 文章controller
@@ -69,9 +70,10 @@ public class ArticleController {
     @GetMapping("/{userId}/articles")
     @ApiOperation(value = "分页获取用户的文章列表", notes = "分页获取用户的文章列表接口")
     @ApiResponse(code = 200, message = "OK", response = ArticleVO.class)
-    public ResponseVO<PageInfo<ArticleVO>> listArticles(@RequestParam @DefaultValue("1") Integer pageNo,
+    public ResponseVO<PageVO<ArticleVO>> listArticles(@Valid @Min(value = 1, message = "page.param.invalid")
+        @RequestParam @DefaultValue("1")Integer pageNo, @Valid @Min(value = 1, message = "page.param.invalid")
         @RequestParam @DefaultValue("10") Integer pageSize, @PathVariable("userId") Long userId) {
-        PageInfo<ArticleVO> articleVoPage = iArticleService.listUserArticles(userId, pageNo, pageSize);
+        PageVO<ArticleVO> articleVoPage = iArticleService.listUserArticles(userId, pageNo, pageSize);
         return ResponseVO.success(articleVoPage);
     }
 
