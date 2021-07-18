@@ -209,19 +209,18 @@ alter table article owner to postgres;
 ### 4.4、统计表
 
 ```sql
-create table count
+create table if not exists count
 (
-	count_id bigint not null constraint count_pk primary key,
-	content_type varchar(20) not null,
+    content_type varchar(20) not null,
     content_id bigint not null,
-	like_count int default 0 not null,
-	collect_count int default 0 not null,
-	comment_count int default 0 not null,
-	is_logic_deleted bool default false not null,
-	version bigint default 0
+    like_count integer default 0 not null,
+    collect_count integer default 0 not null,
+    comment_count integer default 0 not null,
+    is_logic_deleted boolean default false not null,
+    version bigint default 0,
+    constraint count_pk primary key (content_type, content_id)
 );
 comment on table count is '统计表';
-comment on column count.count_id is '主键';
 comment on column count.content_type is '内容分类';
 comment on column count.content_id is '内容主键';
 comment on column count.like_count is '点赞数';
@@ -229,6 +228,7 @@ comment on column count.collect_count is '收藏数';
 comment on column count.comment_count is '评论数';
 comment on column count.is_logic_deleted is '是否已经逻辑删除';
 comment on column count.version is '版本号';
+alter table count owner to postgres;
 ```
 
 ## 5、Elastic Search建索引

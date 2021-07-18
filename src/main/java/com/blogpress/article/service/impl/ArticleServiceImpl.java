@@ -6,6 +6,7 @@ import com.blogpress.article.bean.dto.ArticleDTO;
 import com.blogpress.article.bean.entity.Article;
 import com.blogpress.article.bean.response.ArticleVO;
 import com.blogpress.article.dao.ArticleMapper;
+import com.blogpress.article.request.CreateArticleRequest;
 import com.blogpress.article.service.IArticleService;
 import com.blogpress.common.constants.RedisKeyConstants;
 import com.blogpress.common.exception.BusinessException;
@@ -13,9 +14,11 @@ import com.blogpress.common.util.AssertUtils;
 import com.blogpress.common.util.ContextHolder;
 import com.blogpress.common.util.PageUtils;
 import com.blogpress.common.util.bean.BeanCopyUtils;
-import com.blogpress.count.bean.entity.Count;
-import com.blogpress.count.dao.CountMapper;
+import com.blogpress.count.bean.converter.CountBeanConverter;
+import com.blogpress.count.bean.dto.CountDTO;
+import com.blogpress.count.bean.response.CountVO;
 import com.blogpress.count.enums.ContentTypeEnum;
+import com.blogpress.count.service.ICountService;
 import com.blogpress.user.bean.dto.UserDTO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -42,39 +45,40 @@ import java.util.stream.Collectors;
 public class ArticleServiceImpl implements IArticleService {
 
     @Autowired
-    private ArticleMapper articleMapper;
+    private ICountService iCountService;
 
     @Autowired
-    private CountMapper countMapper;
+    private ArticleMapper articleMapper;
 
     @Autowired
     private RedisTemplate<Object, Object> redisTemplate;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ArticleVO createArticle(ArticleDTO articleDTO) {
+    public ArticleVO createArticle(CreateArticleRequest request) {
         UserDTO user = ContextHolder.currentLoginUser();
 
         Article article = new Article();
-        BeanCopyUtils.copy(articleDTO, article);
+        BeanCopyUtils.copy(request, article);
         article.setUserId(user.getUserId());
         int articleInsertCount = articleMapper.insert(article);
 
-        Count count = new Count();
-        count.setContentId(article.getArticleId());
-        count.setContentType(ContentTypeEnum.ARTICLE.getCode());
-        int countCount = countMapper.insert(count);
+        CountDTO countDTO = iCountService.newCount(ContentTypeEnum.ARTICLE, article.getArticleId());
 
-        if (articleInsertCount > 0 && countCount > 0) {
+        if (articleInsertCount > 0 && countDTO != null) {
             // 插入文章主体
             Article createdArticle = articleMapper.selectById(article.getArticleId());
-            Count articleCount = countMapper.selectById(count.getCountId());
-            ArticleVO articleVO = ArticleBeanConverter.toArticleVO(createdArticle, articleCount);
+            ArticleDTO articleDTO = ArticleBeanConverter.toArticleDTO(createdArticle);
+
+            ArticleVO articleVO = ArticleBeanConverter.toArticleVO(articleDTO);
+            CountVO countVO = CountBeanConverter.toCountVO(countDTO);
             String articleKey = RedisKeyConstants.articleKey(article.getArticleId());
-            redisTemplate.opsForValue().set(articleKey, articleVO);
+
+            redisTemplate.opsForValue().set(articleKey, articleDTO);
+            articleVO.setCount(countVO);
             return articleVO;
         } else {
-            log.error("Create article failed, param: {}", JSON.toJSONString(articleDTO));
+            log.error("Create article failed, param: {}", JSON.toJSONString(request));
             throw BusinessException.of("operate.failed");
         }
     }
@@ -83,18 +87,26 @@ public class ArticleServiceImpl implements IArticleService {
     public ArticleVO getArticleById(Long articleId) {
         // 从Redis取缓存数据，若有，直接返回
         String articleKey = RedisKeyConstants.articleKey(articleId);
-        ArticleVO vo = (ArticleVO) redisTemplate.opsForValue().get(articleKey);
-        if (vo != null) {
-            return vo;
+        CountDTO countDTO = iCountService.getCount(ContentTypeEnum.ARTICLE, articleId);
+        CountVO countVO = CountBeanConverter.toCountVO(countDTO);
+        ArticleDTO articleDTO = (ArticleDTO) redisTemplate.opsForValue().get(articleKey);
+        ArticleVO articleVO;
+        if (articleDTO != null) {
+            articleVO = ArticleBeanConverter.toArticleVO(articleDTO);
+            articleVO.setCount(countVO);
+            return articleVO;
         }
         // Redis没有数据，从数据库取，并且同步至Redis
         Article article = articleMapper.selectById(articleId);
         AssertUtils.isNotNull(article, "article.not.exist");
 
-        ArticleDTO dto = ArticleBeanConverter.toArticleDTO(article);
-        vo = ArticleBeanConverter.toArticleVO(dto);
-        redisTemplate.opsForValue().set(articleKey, vo);
-        return vo;
+
+        articleDTO = ArticleBeanConverter.toArticleDTO(article);
+        redisTemplate.opsForValue().set(articleKey, articleDTO);
+
+        articleVO = ArticleBeanConverter.toArticleVO(articleDTO);
+        articleVO.setCount(countVO);
+        return articleVO;
     }
 
     @Override
@@ -105,11 +117,12 @@ public class ArticleServiceImpl implements IArticleService {
 
         AssertUtils.equal(user.getUserId(), article.getUserId(), "no.permission.to.delete.article");
 
-        int count = articleMapper.deleteById(articleId);
+        int articleDeleteCount = articleMapper.deleteById(articleId);
 
-        if(count > 0){
+        if(articleDeleteCount > 0){
             String articleKey = RedisKeyConstants.articleKey(articleId);
             redisTemplate.delete(articleKey);
+            iCountService.deleteCount(ContentTypeEnum.ARTICLE, articleId);
             return true;
         } else {
             log.error("Delete article failed, articleId: {}", articleId);
@@ -124,12 +137,18 @@ public class ArticleServiceImpl implements IArticleService {
         PageInfo<ArticleVO> pageInfo = PageUtils.of(articleList, ArticleVO.class);
         if(!CollectionUtils.isEmpty(articleList)){
             List<Long> articleIds = articleList.stream().map(Article::getArticleId).collect(Collectors.toList());
-            Map<Long, Count> countMap = new HashMap<>();
+            Map<Long, CountDTO> countMap = new HashMap<>();
             if (!CollectionUtils.isEmpty(articleIds)) {
-                countMap = countMapper.selectByContentTypeAndIds(ContentTypeEnum.ARTICLE, articleIds);
+                countMap = iCountService.listCount(ContentTypeEnum.ARTICLE, articleIds);
             }
-            Map<Long, Count> finalCountMap = countMap;
-            List<ArticleVO> articleVOList = articleList.stream().map(e -> ArticleBeanConverter.toArticleVO(e, finalCountMap.get(e.getArticleId()))).collect(Collectors.toList());
+            Map<Long, CountDTO> finalCountMap = countMap;
+            List<ArticleVO> articleVOList = articleList.stream().map(e -> {
+                ArticleVO articleVO = ArticleBeanConverter.toArticleVO(e);
+                CountDTO count = finalCountMap.get(e.getArticleId());
+                CountVO countVO = CountBeanConverter.toCountVO(count);
+                articleVO.setCount(countVO);
+                return articleVO;
+            }).collect(Collectors.toList());
             pageInfo.setList(articleVOList);
         }
         return pageInfo;

@@ -1,7 +1,7 @@
 package com.blogpress.article.service;
 
-import com.blogpress.article.bean.dto.ArticleDTO;
 import com.blogpress.article.bean.response.ArticleVO;
+import com.blogpress.article.request.CreateArticleRequest;
 import com.github.pagehelper.PageInfo;
 
 /**
@@ -12,10 +12,10 @@ public interface IArticleService {
 
     /**
      * 新建文章
-     * @param articleDTO ArticleDTO
+     * @param request CreateArticleRequest
      * @return ArticleVO
      */
-    ArticleVO createArticle(ArticleDTO articleDTO);
+    ArticleVO createArticle(CreateArticleRequest request);
 
     /**
      * 获取文章详情

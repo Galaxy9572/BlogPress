@@ -13,9 +13,6 @@ public class CountDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /** 主键 */
-    private Long countId;
-
     /** 内容类型 */
     private String contentType;
 

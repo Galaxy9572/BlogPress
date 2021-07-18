@@ -32,4 +32,12 @@ public interface CountMapper extends BaseMapper<Count> {
     @MapKey("contentId")
     Map<Long, Count> selectByContentTypeAndIds(@Param("contentType") ContentTypeEnum contentType, @Param("contentIds") List<Long> contentIds);
 
+    /**
+     * 根据内容类型和内容的ID删除统计信息
+     * @param contentType 内容类型
+     * @param contentId 内容的ID
+     * @return count
+     */
+    int deleteByContentTypeAndId(@Param("contentType") ContentTypeEnum contentType, @Param("contentId") Long contentId);
+
 }

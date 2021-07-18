@@ -1,7 +1,5 @@
 package com.blogpress.count.bean.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
 import lombok.Data;
@@ -13,10 +11,6 @@ import lombok.Data;
 @Data
 @TableName("count")
 public class Count {
-
-    /** 主键 */
-    @TableId(type = IdType.ASSIGN_ID)
-    private Long countId;
 
     /** 内容类型 */
     private String contentType;

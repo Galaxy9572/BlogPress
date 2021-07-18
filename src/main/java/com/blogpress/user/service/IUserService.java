@@ -1,6 +1,7 @@
 package com.blogpress.user.service;
 
-import com.blogpress.user.bean.dto.UserDTO;
+import com.blogpress.user.bean.request.UserLoginRequest;
+import com.blogpress.user.bean.request.UserRegisterRequest;
 import com.blogpress.user.bean.response.UserVO;
 
 /**
@@ -11,16 +12,16 @@ public interface IUserService {
 
     /**
      * 用户注册
-     * @param user UserDTO
+     * @param request UserRegisterRequest
      * @return UserVO
      */
-    UserVO register(UserDTO user);
+    UserVO register(UserRegisterRequest request);
 
     /**
      * 用户登录
-     * @param user UserDTO
+     * @param request UserLoginRequest
      * @return UserVO
      */
-    UserVO login(UserDTO user);
+    UserVO login(UserLoginRequest request);
 
 }

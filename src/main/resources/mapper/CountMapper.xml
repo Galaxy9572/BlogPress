@@ -5,7 +5,7 @@
 <mapper namespace="com.blogpress.count.dao.CountMapper">
 
     <sql id="All_Columns">
-        count_id, content_type, content_id, like_count, collect_count, comment_count, is_logic_deleted, version
+        content_type, content_id, like_count, collect_count, comment_count, is_logic_deleted, version
     </sql>
 
     <select id="selectByContentTypeAndId" resultType="com.blogpress.count.bean.entity.Count">
@@ -30,5 +30,16 @@
             and is_logic_deleted = false
         </where>
     </select>
+
+    <update id="deleteByContentTypeAndId">
+        update count
+        <set>
+            is_logic_deleted = true
+        </set>
+        <where>
+            content_type = #{contentType.code}
+            and content_id = #{contentId}
+        </where>
+    </update>
     
 </mapper>

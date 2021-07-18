@@ -1,8 +1,6 @@
 package com.blogpress.user.controller;
 
 import com.blogpress.common.rest.ResponseVO;
-import com.blogpress.user.bean.converter.UserBeanConverter;
-import com.blogpress.user.bean.dto.UserDTO;
 import com.blogpress.user.bean.request.UserLoginRequest;
 import com.blogpress.user.bean.request.UserRegisterRequest;
 import com.blogpress.user.bean.response.UserVO;
@@ -45,8 +43,7 @@ public class UserController {
     public ResponseVO<UserVO> register(@ApiParam(name = "用户注册入参", required = true) @Valid @NotNull
         @RequestBody UserRegisterRequest registerRequest) {
 
-        UserDTO userDTO = UserBeanConverter.toUserDTO(registerRequest);
-        UserVO userVO = iUserService.register(userDTO);
+        UserVO userVO = iUserService.register(registerRequest);
         return ResponseVO.success(userVO);
     }
 
@@ -56,8 +53,7 @@ public class UserController {
     public ResponseVO<UserVO> login(@ApiParam(name = "用户登录入参", required = true) @Valid @NotNull
         @RequestBody UserLoginRequest loginRequest) {
 
-        UserDTO userDTO = UserBeanConverter.toUserDTO(loginRequest);
-        UserVO userVO = iUserService.login(userDTO);
+        UserVO userVO = iUserService.login(loginRequest);
         return ResponseVO.success(userVO);
     }
 

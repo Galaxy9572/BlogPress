@@ -1,7 +1,5 @@
 package com.blogpress.article.controller;
 
-import com.blogpress.article.bean.converter.ArticleBeanConverter;
-import com.blogpress.article.bean.dto.ArticleDTO;
 import com.blogpress.article.bean.response.ArticleVO;
 import com.blogpress.article.request.CreateArticleRequest;
 import com.blogpress.article.service.IArticleService;
@@ -43,8 +41,7 @@ public class ArticleController {
     @ApiResponse(code = 200, message = "OK", response = ArticleVO.class)
     public ResponseVO<ArticleVO> createArticle(@ApiParam(name = "新增文章入参", required = true)
         @Valid @RequestBody CreateArticleRequest request) {
-        ArticleDTO articleDTO = ArticleBeanConverter.toArticleDTO(request);
-        ArticleVO vo = iArticleService.createArticle(articleDTO);
+        ArticleVO vo = iArticleService.createArticle(request);
         return ResponseVO.success(vo);
     }
 

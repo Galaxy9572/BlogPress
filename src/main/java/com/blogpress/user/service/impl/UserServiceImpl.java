@@ -11,6 +11,8 @@ import com.blogpress.user.bean.converter.UserBeanConverter;
 import com.blogpress.user.bean.dto.UserDTO;
 import com.blogpress.user.bean.entity.User;
 import com.blogpress.user.bean.entity.UserRole;
+import com.blogpress.user.bean.request.UserLoginRequest;
+import com.blogpress.user.bean.request.UserRegisterRequest;
 import com.blogpress.user.bean.response.UserVO;
 import com.blogpress.user.dao.UserMapper;
 import com.blogpress.user.dao.UserRoleMapper;
@@ -43,16 +45,16 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public UserVO register(UserDTO userDTO) {
+    public UserVO register(UserRegisterRequest request) {
         // 注册前检查昵称是否已被注册
-        User existUser = userMapper.getUserByNick(userDTO.getNick());
+        User existUser = userMapper.getUserByNick(request.getNick());
         AssertUtils.isNull(existUser, "user.already.registered");
 
         // 用户表插入数据
         User user = new User();
-        BeanCopyUtils.copy(userDTO, user);
+        BeanCopyUtils.copy(request, user);
         String salt = HashUtils.randomUuid();
-        String passwordHash = HashUtils.sha256(userDTO.getPassword() + salt);
+        String passwordHash = HashUtils.sha256(request.getPassword() + salt);
         user.setPasswordHash(passwordHash);
         user.setSalt(salt);
         int userCount = userMapper.insert(user);
@@ -72,25 +74,25 @@ public class UserServiceImpl implements IUserService {
             ContextHolder.addUserSession(dto);
             return vo;
         } else {
-            log.error("Register Failed, Param: {}", JSON.toJSONString(userDTO));
+            log.error("Register Failed, Param: {}", JSON.toJSONString(request));
             throw BusinessException.of("user.register.failed");
         }
     }
 
     @Override
-    public UserVO login(UserDTO user) {
+    public UserVO login(UserLoginRequest request) {
         UserDTO dto = ContextHolder.currentLoginUser();
         if (dto != null) {
             return UserBeanConverter.toUserVO(dto);
         }
         // 检查用户是否存在
-        User existUser = userMapper.getUserByNick(user.getNick());
+        User existUser = userMapper.getUserByNick(request.getNick());
         AssertUtils.isNotNull(existUser, "user.not.exist");
 
         // 检查密码是否正确
         String salt = existUser.getSalt();
         String passwordHash = existUser.getPasswordHash();
-        String password = user.getPassword();
+        String password = request.getPassword();
         String loginPasswordHash = HashUtils.sha256(password + salt);
         AssertUtils.equal(loginPasswordHash, passwordHash, "nick.or.password.wrong");
 
