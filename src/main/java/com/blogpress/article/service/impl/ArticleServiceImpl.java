@@ -20,7 +20,6 @@ import com.blogpress.count.bean.dto.CountDTO;
 import com.blogpress.count.bean.response.CountVO;
 import com.blogpress.count.enums.ContentTypeEnum;
 import com.blogpress.count.service.ICountService;
-import com.blogpress.search.service.ISearchService;
 import com.blogpress.user.bean.dto.UserDTO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;

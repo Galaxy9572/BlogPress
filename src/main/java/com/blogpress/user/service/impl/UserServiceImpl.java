@@ -7,7 +7,6 @@ import com.blogpress.common.util.AssertUtils;
 import com.blogpress.common.util.ContextHolder;
 import com.blogpress.common.util.HashUtils;
 import com.blogpress.common.util.bean.BeanCopyUtils;
-import com.blogpress.search.service.ISearchService;
 import com.blogpress.user.bean.converter.UserBeanConverter;
 import com.blogpress.user.bean.dto.UserDTO;
 import com.blogpress.user.bean.entity.User;
